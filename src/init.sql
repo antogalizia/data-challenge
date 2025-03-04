@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS `meliproject-452420.chromecast_ml.products` (
     seller_id INT64 NOT NULL,
     title STRING NOT NULL,
     price FLOAT64 NOT NULL,
-    stock INT64,
+    available_quantity INT64,
     condition STRING,
     brand STRING,
     model STRING,

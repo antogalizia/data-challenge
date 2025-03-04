@@ -33,3 +33,23 @@ def load_data(json_data: dict, file_name: str, relative_path: str):
         print(f"Error al guardar el archivo JSON: {e}")
         raise  
     
+
+def load_ndjson(json_data: dict, file_name: str, relative_path: str):
+
+    # Ruta completa del destino de los datos
+    directory = Path("data") / relative_path
+
+    # Creación del directorio
+    directory.mkdir(parents=True, exist_ok=True)
+
+    # Ruta completa del JSON
+    file_path = directory / file_name
+
+    try:
+        with file_path.open("w", encoding="utf-8") as f:
+            for obj in json_data:
+                f.write(json.dumps(obj) + "\n")  # Escribe cada objeto en una nueva línea
+
+    except (OSError, json.JSONDecodeError) as e:
+        print(f"Error al guardar el archivo JSON: {e}")
+        raise  

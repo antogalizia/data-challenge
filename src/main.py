@@ -1,11 +1,17 @@
 from extraction.extract import get_data
+from transformation.transform import create_tables
 
 API_URL = "https://api.mercadolibre.com/sites/MLA/search"
 params = {"q": "chromecast", "limit": 50}
 
 def main():
-    get_data(API_URL, num_requests=10, params=params, save_to="raw")
-    
+    try:
+        get_data(API_URL, num_requests=10, params=params, save_to="raw")
+        create_tables('data/raw/data.json')
+        
+
+    except Exception as e:
+        print(f"Error en el pipeline: {e}")
 
 if __name__ == "__main__":
     main()
