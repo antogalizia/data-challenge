@@ -1,6 +1,50 @@
-from load.load import load_ndjson
+from load.load import load_ndjson, load_data
+from pathlib import Path
 import json
 import uuid
+import pandas as pd
+
+
+def cleaning():
+    input_dir = Path("data/processed") 
+    output_dir = "clean"
+
+    # Reglas de limpieza según archivo
+    CLEANING_RULES = {
+        "products": {"id_column": "product_id", "required_columns": ["product_id", "seller_id", "title"]},
+        "shipments": {"id_column": "shipping_id", "required_columns": ["shipping_id", "product_id"]},
+        "sellers": {"id_column": "seller_id", "required_columns": ["seller_id", "name"]}
+    }
+    
+    # Itero sobre cada archivo en processed/
+    for file_path in input_dir.glob("*.json"):  
+        # Nombre sin extensión
+        file_name = file_path.stem  
+
+        # Verifico si hay reglas definidas para este archivo
+        if file_name not in CLEANING_RULES:
+            continue
+        
+        # Obtengo las reglas específicas del archivo actual
+        rules = CLEANING_RULES[file_name]  
+
+        try:
+            # Cargo el JSON a un dataframe
+            df = pd.read_json(file_path, orient="records")
+
+            # Limpieza dinámica según las reglas
+            df.dropna(subset=rules["required_columns"], inplace=True)
+            df.drop_duplicates(subset=[rules["id_column"]], keep="first", inplace=True)         
+
+            # Almacenamiento
+            json_data = df.to_dict(orient="records")
+            load_ndjson(json_data, f"{file_name}.json", output_dir)
+
+        except json.JSONDecodeError as e:
+            print(f"Error en {file_name}.json: formato JSON inválido - {e}")
+        except Exception as e:
+            print(f"Error inesperado en {file_name}.json: {e}")
+
 
 
 # Función auxiliar para obtener el valor de un atributo específico
@@ -52,4 +96,4 @@ def create_tables(file):
 
     tables = {"products": products, "sellers": sellers, "shipments": shipments}
     for name, data in tables.items():
-        load_ndjson(data, f"{name}_table.json", "clean")
+        load_data(data, f"{name}.json", "processed")
