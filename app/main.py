@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 from app.routes import router
 
-app = FastAPI(title="miapi", version="1.0")
+app = FastAPI(title="streamingdevices-api", version="1.0")
 
 app.include_router(router)
 

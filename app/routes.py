@@ -1,12 +1,14 @@
 from fastapi import APIRouter, HTTPException, status
+import logging
 from app.services import extract_data, processed_data, clean_data
 
 router = APIRouter()
 
-#@router.get("/extraction", status_code=status.HTTP_200_OK)
-#def extract():
-#    data = extract_data()
-#    return {"data": data}
+
+@router.get("/extraction", status_code=status.HTTP_200_OK)
+def extract():
+    data = extract_data()
+    return {"data": data}
 
 
 @router.get("/processed", status_code=status.HTTP_200_OK)

@@ -27,30 +27,35 @@ class Extract:
 
         for i in range(num_requests):
             try:
+                if params is None:
+                    params = {}
+
                 # Corrección de paginación en cada iteración
                 params.update({"offset": i * 50})  
                 
                 # Solicitud GET para la obtención de datos
                 response = requests.get(url, params=params)
+
+                if response.status_code == 404:
+                    raise HTTPException(status_code=404, detail="Recurso no encontrado")
+                
                 response.raise_for_status()
 
-                try:
-                    # Codificación a JSON y extracción de key de resultados
-                    json_response = response.json()
-                    results = json_response.get("results", []) 
+                # Codificación a JSON y extracción de key de resultados
+                json_response = response.json()
+                results = json_response.get("results", []) 
+
+                if not isinstance(results, list):
+                    raise ValueError(f"'results' no es una lista en la página {i}")
                     
-                    # Se agregan los datos a la lista 
-                    if isinstance(results, list):
-                        data.extend(results)  
-                    else:
-                        print(f"Error: 'results' no es una lista en la página {i}")
-
-                except requests.exceptions.JSONDecodeError:
-                    print(f"Error al decodificar JSON en la página {i}")
-
+                data.extend(results)  
+                    
             except requests.exceptions.RequestException as e:
-                print(f"Falló en la solicitud GET en la página {i}: {e}")
-                continue 
+                print(f"Error en solicitud GET en la página {i}: {e}")
+                raise  
+            except (json.JSONDecodeError, ValueError) as e:
+                print(f"Error en la estructura de datos en la página {i}: {e}")
+                raise
 
         # Instancio la clase Load para guardar los datos
         loader = Load()
@@ -58,7 +63,6 @@ class Extract:
         loader.load_data(data, file_name, save_to)
         return data
         
-
 class Transform:
 
     def get_attribute_value(self, attributes, key):
@@ -70,21 +74,22 @@ class Transform:
                 return attr.get("value_name", None)
         return None
 
-
     def parsed_data(self):
         """
         Función que realiza el parseo de los datos al modelo relacional.
         """
-        # Verifico si el archivo existe
-        data_raw_path = "data/raw/data.json"
-        if not os.path.exists(data_raw_path):
-            raise FileNotFoundError(f"No se encontró el archivo {data_raw_path}")
 
+        data_raw_path = "data/raw/data.json"
         products, sellers, shipments = [], [], []
 
         # Leer los datos desde el archivo JSON en data/raw
-        with open(data_raw_path, "r", encoding="utf-8") as file:
-            data = json.load(file)
+        try:
+            with open(data_raw_path, "r", encoding="utf-8") as file:
+                data = json.load(file)
+        except FileNotFoundError:
+            raise FileNotFoundError(f"No se encontró el archivo {data_raw_path}")
+        except json.JSONDecodeError as e:
+            raise ValueError(f"Error en la estructura del archivo JSON {data_raw_path}: {e}")
 
         for elem in data:
             attributes = elem.get("attributes", [])
@@ -124,7 +129,6 @@ class Transform:
         
         return tables
     
-
     def cleaning(self):
         input_dir = Path("data/processed") 
         output_dir = "clean"
@@ -167,16 +171,15 @@ class Transform:
                 # Agrego los datos limpios al diccionario de retorno
                 cleaned_data[file_name] = json_data
 
-
             except json.JSONDecodeError as e:
-                print(f"Error en {file_name}.json: formato JSON inválido - {e}")
+                raise ValueError(f"Error en {file_name}.json: formato JSON inválido - {e}")
             except Exception as e:
                 print(f"Error inesperado en {file_name}.json: {e}")
 
         return cleaned_data
 
-
 class Load:
+
     def load_data(self, json_data: dict, file_name: str, relative_path: str):
         """
         Guarda un JSON en el directorio 'data/' dentro del proyecto.
@@ -205,10 +208,8 @@ class Load:
                 json.dump(json_data, f, ensure_ascii=False, indent=4)
 
         except (OSError, json.JSONDecodeError) as e:
-            print(f"Error al guardar el archivo JSON: {e}")
-            raise  
-    
-
+            raise OSError(f"Error al guardar el archivo JSON: {e}")
+              
     def load_ndjson(json_data: dict, file_name: str, relative_path: str):
 
         # Ruta completa del destino de los datos
@@ -227,5 +228,5 @@ class Load:
                     f.write(json.dumps(obj) + "\n")  
 
         except (OSError, json.JSONDecodeError) as e:
-            print(f"Error al guardar el archivo JSON: {e}")
-            raise  
+            raise OSError(f"Error al guardar el archivo JSON: {e}")
+              
