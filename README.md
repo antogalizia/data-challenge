@@ -47,6 +47,7 @@ La API está disponible en:
 
     En particular también se puede acceder a `processed/products`, `processed/shipments` y `processed/sellers` para obtener la información segmentada.
 <br>
+
 - **Obtener datos limpios:**
   ```sh
   curl -X GET "https://data-challenge.onrender.com/cleaned"
