@@ -5,8 +5,11 @@ from src.auth import get_token
 import os
 
 router = APIRouter()
+
 CLIENT_ID = os.getenv("CLIENT_ID")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
+
+
 
 @router.get("/", status_code=status.HTTP_200_OK)
 def welcome():
