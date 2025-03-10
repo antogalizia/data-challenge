@@ -60,7 +60,7 @@ La API está disponible en:
 
 1. Clonar el repositorio.
    ```sh
-   git clone https://github.com/tu-usuario/data-challenge.git
+   git clone https://github.com/antogalizia/data-challenge.git
    cd data-challenge
    ```
 2. Crear y activar un entorno virtual.

@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status
+from fastapi import APIRouter, HTTPException, status, Request
 from app.services import extract_data, processed_data, clean_data
 
 router = APIRouter()
@@ -6,6 +6,16 @@ router = APIRouter()
 @router.get("/", status_code=status.HTTP_200_OK)
 def extract():
     return "Bienvenida/o a la API de Dispositivos de Streaming de MeLi"
+
+
+@router.get("/callback")
+async def callback(request: Request):
+    # Capturo el código de autorización
+    code = request.query_params.get("code") 
+    if code:
+        return {"message": "Código de autorización recibido", "code": code}
+    else:
+        return {"error": "No se recibió código de autorización"}
 
 
 @router.get("/extraction", status_code=status.HTTP_200_OK)
