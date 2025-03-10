@@ -1,17 +1,24 @@
-# auth.py
+import os
 import requests
+from dotenv import load_dotenv
 
-def obtener_token(client_id, client_secret, code, redirect_uri):
+load_dotenv()
+CLIENT_ID = os.getenv("CLIENT_ID")
+CLIENT_SECRET = os.getenv("CLIENT_SECRET")
+REDIRECT_URI = os.getenv("REDIRECT_URI")
+
+
+def get_token(code):
     url = 'https://api.mercadolibre.com/oauth/token'
     data = {
         'grant_type': 'authorization_code',
-        'client_id': client_id,
-        'client_secret': client_secret,
-        'code': code,
-        'redirect_uri': redirect_uri
+        'client_id': CLIENT_ID,
+        'client_secret': CLIENT_SECRET,
+        'redirect_uri': REDIRECT_URI,
+        'code': code
     }
 
-    response = requests.post(url, data=data)
+    response = requests.post(url, json=data)
 
     if response.status_code == 200:
         token_data = response.json()

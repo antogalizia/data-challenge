@@ -1,13 +1,43 @@
+from src.auth import get_token
 from pathlib import Path
 from fastapi import HTTPException
 import json
 import uuid
 import pandas as pd
 import requests
-import os 
 
 
 class Extract:
+
+    def __init__(self, client_id, client_secret, redirect_uri):
+        self.client_id = client_id
+        self.client_secret = client_secret
+        self.redirect_uri = redirect_uri
+        self.access_token = None
+        self.code = None
+
+    def set_code(self, code):
+        """
+        Configura el código de autorización y obtiene el token de acceso
+        """
+        self.code = code
+        self.get_access_token()
+
+    def get_access_token(self):
+        """
+        Obtiene el token de acceso llamando a la función de auth.py
+        """
+        if not self.code:
+            #print("No se ha proporcionado un código de autorización.")
+            return None
+
+        self.access_token = get_token(self.code)
+
+        if self.access_token:
+            print(f"Token obtenido exitosamente: {self.access_token}")
+        else:
+            print("Error al obtener el token.")
+
 
     def get_data(self, url, num_requests, params=None, save_to="raw"):
         """
@@ -22,6 +52,14 @@ class Extract:
         Retorna:
         data: json de respuesta
         """
+        if not self.access_token:
+            print("No se ha obtenido un token de acceso.")
+            return None
+        
+        headers = {
+            'Authorization': f'Bearer {self.access_token}',
+            'Accept': 'application/json'
+        }
 
         data = []  
 
@@ -34,7 +72,7 @@ class Extract:
                 params.update({"offset": i * 50})  
                 
                 # Solicitud GET para la obtención de datos
-                response = requests.get(url, params=params)
+                response = requests.get(url, params=params, headers=headers)
 
                 if response.status_code == 404:
                     raise HTTPException(status_code=404, detail="Recurso no encontrado")
