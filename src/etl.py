@@ -17,10 +17,10 @@ class Extract:
         url(str): url de la API que en este caso incluye los parámetros de ruta
         num_requests(int): cantidad de peticiones 
         params(dict): parámetros de consulta
-        save_to (str): subdirectorio dentro de "data/" donde se guardarán los datos
+        save_to(str): subdirectorio dentro de "data/" donde se guardarán los datos
 
         Retorna:
-        output_file(str): JSON de respuesta
+        data: json de respuesta
         """
 
         data = []  
@@ -68,6 +68,10 @@ class Transform:
     def get_attribute_value(self, attributes, key):
         """
         Función auxiliar para obtener el valor de un atributo específico.
+
+        Parámetros:
+        attributes(list): lista de atributos
+        key(str): key a buscar para obtener su valor
         """
         for attr in attributes:
             if attr.get("id") == key:
@@ -130,6 +134,9 @@ class Transform:
         return tables
     
     def cleaning(self):
+        """
+        Función que aplica reglas de limpieza.
+        """
         input_dir = Path("data/processed") 
         output_dir = "clean"
         cleaned_data = {}
@@ -182,15 +189,12 @@ class Load:
 
     def load_data(self, json_data: dict, file_name: str, relative_path: str):
         """
-        Guarda un JSON en el directorio 'data/' dentro del proyecto.
+        Guarda un JSON en el directorio 'data/relative_path' dentro del proyecto.
 
         Parámetros:
         json_data(dict): el contenido que se va a almacenar
         file_name(str): nombre del archivo con extensión .json
         relative_path(str): ruta relativa al destino final del archivo
-
-        Retorna:
-        Ruta completa donde se guardó el archivo
         """
 
         # Ruta completa del destino de los datos

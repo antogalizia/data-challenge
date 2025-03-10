@@ -1,8 +1,11 @@
 from fastapi import APIRouter, HTTPException, status
-import logging
 from app.services import extract_data, processed_data, clean_data
 
 router = APIRouter()
+
+@router.get("/", status_code=status.HTTP_200_OK)
+def extract():
+    return "Bienvenida/o a la API de Dispositivos de Streaming de MeLi"
 
 
 @router.get("/extraction", status_code=status.HTTP_200_OK)
