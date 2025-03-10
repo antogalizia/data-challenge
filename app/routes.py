@@ -5,18 +5,11 @@ from src.auth import get_token
 import os
 
 router = APIRouter()
-
 CLIENT_ID = os.getenv("CLIENT_ID")
 REDIRECT_URI = os.getenv("REDIRECT_URI")
 
 
-
-@router.get("/", status_code=status.HTTP_200_OK)
-def welcome():
-    return "Bienvenida/o a la API de Dispositivos de Streaming de MeLi"
-
-
-@router.get("/authorize")
+@router.get("/")
 async def authorize():
     """
     Redirige al usuario a la URL de autorización de Mercado Libre.
@@ -42,33 +35,6 @@ async def callback(request: Request):
     else:
         raise HTTPException(status_code=500, detail="Error al obtener el token")
 
-"""
-@router.get("/callback")
-async def callback(request: Request):
-    code = request.query_params.get("code")  # Captura el código de autorización
-    
-    if not code:
-        raise HTTPException(status_code=400, detail="No se recibió código de autorización")
-
-    access_token = get_token(code)  # Obtiene el token de Mercado Libre
-    if access_token:
-        return {"message": "Token obtenido", "access_token": access_token}
-    else:
-        raise HTTPException(status_code=500, detail="Error al obtener el token")
-
-
-@router.get("/extraction", status_code=status.HTTP_200_OK)
-def extract():
-    # Captura el parámetro `code` de la URL
-    #code = request.query_params.get("code")
-
-    #if not code:
-        #raise HTTPException(status_code=400, detail="No se proporcionó el código de autorización.")
-    
-    #data = extract_data(code)
-    data = extract_data()
-    return {"data": data}
-"""
 
 @router.get("/extraction", status_code=status.HTTP_200_OK)
 def extract(access_token: str):
@@ -80,6 +46,7 @@ def extract(access_token: str):
 
     data = extract_data(access_token)
     return {"data": data}
+
 
 @router.get("/processed", status_code=status.HTTP_200_OK)
 def get_processed():
