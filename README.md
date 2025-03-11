@@ -34,51 +34,52 @@ Este proyecto implementa un pipeline ETL que extrae, transforma y limpia datos p
 La API está disponible en:  
 🔗 [https://data-challenge.onrender.com](https://data-challenge.onrender.com)  
 
+#### Pasos para autenticarse y consumir la API
+
+Antes de consultar los endpoints, los usuarios deben autenticarse con Mercado Libre para obtener un *access_token*.
+
+1. Al acceder a https://data-challenge.onrender.com serás redirigido/a al enlace de autenticación de Mercado Libre donde se debe iniciar sesión. Consultar por credenciales de prueba.
+
+2. Autorizar la aplicación.
+
+3. Redireccionamiento a la generación del *access_token* donde el servidor responderá con un JSON que incluye el mismo.
+
+4. Ahora puedes llamar a los endpoints de la API incluyendo el token de dos maneras:
+<br>   
+
+   - **Desde `curl`**: Incluye el token en el header `Authorization` con el siguiente comando:
+     ```sh
+     curl -X GET "https://data-challenge.onrender.com/extraction" -H "Authorization: Bearer MI_ACCESS_TOKEN"
+     ```
+     
+   - **Desde el navegador**: Agrega el token como un parámetro de consulta en la URL:
+     ```sh
+     https://data-challenge.onrender.com/extraction?access_token=MI_ACCESS_TOKEN
+     ```
+
 ### Endpoints Disponibles
 
 - **Obtener datos extraídos:**
-  ```sh
-  curl -X GET "https://data-challenge.onrender.com/extraction"
-  ```
+     ```sh
+     curl -X GET "https://data-challenge.onrender.com/extraction" -H "Authorization: Bearer MI_ACCESS_TOKEN"
+     ```
+
 - **Obtener datos transformados:**
-  ```sh
-  curl -X GET "https://data-challenge.onrender.com/processed"
-  ```
+     ```sh
+     curl -X GET "https://data-challenge.onrender.com/processed" -H "Authorization: Bearer MI_ACCESS_TOKEN"
+     ```
 
     En particular también se puede acceder a `processed/products`, `processed/shipments` y `processed/sellers` para obtener la información segmentada.
 <br>
 
 - **Obtener datos limpios:**
-  ```sh
-  curl -X GET "https://data-challenge.onrender.com/cleaned"
-  ```
+     ```sh
+     curl -X GET "https://data-challenge.onrender.com/cleaned" -H "Authorization: Bearer MI_ACCESS_TOKEN"
+     ```
 
   Ídem ítem anterior para acceder a la información segmentada.
 <br>
 
-### Instalación y uso local
-
-1. Clonar el repositorio.
-   ```sh
-   git clone https://github.com/antogalizia/data-challenge.git
-   cd data-challenge
-   ```
-2. Crear y activar un entorno virtual.
-   ```sh
-   python -m venv venv
-   source venv/bin/activate  # En macOS/Linux
-   venv\Scripts\activate     # En Windows
-   ```
-3. Instalar dependencias.
-   ```sh
-   pip install -r requirements.txt
-   ```
-
-4. Ejecutar el servidor FastAPI:
-
-    ```sh
-    uvicorn app.main:app --reload
-    ```
 
 ***
 ## Flujo ETL
