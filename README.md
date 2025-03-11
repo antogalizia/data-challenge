@@ -45,7 +45,6 @@ Antes de consultar los endpoints, los usuarios deben autenticarse con Mercado Li
 3. Redireccionamiento a la generación del *access_token* donde el servidor responderá con un JSON que incluye el mismo.
 
 4. Ahora puedes llamar a los endpoints de la API incluyendo el token de dos maneras:
-<br>   
 
    - **Desde `curl`**: Incluye el token en el header `Authorization` con el siguiente comando:
      ```sh
