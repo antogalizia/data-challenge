@@ -49,8 +49,8 @@ async def get_extraction(
     if not access_token:
         raise HTTPException(status_code=400, detail="Se requiere un access_token")
 
-    # Aquí iría la lógica para extraer los datos con el access_token
-    return {"message": "Datos extraídos con éxito", "token_usado": access_token}
+    data = extract_data(access_token)
+    return {"data": data}
 
 
 """
