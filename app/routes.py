@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Request
+from fastapi import APIRouter, HTTPException, status, Request, Header
 from fastapi.responses import RedirectResponse
 from app.services import extract_data, processed_data, clean_data
 from src.auth import get_token
@@ -37,15 +37,28 @@ async def callback(request: Request):
 
 
 @router.get("/extraction", status_code=status.HTTP_200_OK)
+def extract(authorization: str = Header(None)):
+    if not authorization or not authorization.startswith("Bearer "):
+        raise HTTPException(status_code=400, detail="Token de autorización no proporcionado correctamente.")
+
+    access_token = authorization.split("Bearer ")[1]  # Extrae el token del header
+
+    data = extract_data(access_token)
+    return {"data": data}
+
+
+"""
+@router.get("/extraction", status_code=status.HTTP_200_OK)
 def extract(access_token: str):
-    """
+    
     Extrae los datos usando el access_token obtenido en /callback.
-    """
+    
     if not access_token:
         raise HTTPException(status_code=400, detail="No se proporcionó un token de acceso.")
 
     data = extract_data(access_token)
     return {"data": data}
+"""
 
 
 @router.get("/processed", status_code=status.HTTP_200_OK)
