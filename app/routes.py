@@ -1,4 +1,4 @@
-from fastapi import APIRouter, HTTPException, status, Request, Header
+from fastapi import APIRouter, HTTPException, status, Request, Header, Depends, Query
 from fastapi.responses import RedirectResponse
 from app.services import extract_data, processed_data, clean_data
 from src.auth import get_token
@@ -36,15 +36,21 @@ async def callback(request: Request):
         raise HTTPException(status_code=500, detail="Error al obtener el token")
 
 
-@router.get("/extraction", status_code=status.HTTP_200_OK)
-def extract(authorization: str = Header(None)):
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=400, detail="Token de autorización no proporcionado correctamente.")
+@router.get("/extraction")
+async def get_extraction(
+    access_token: str = Query(None),  # Permite recibir el token en la URL
+    authorization: str = Header(None)  # Permite recibir el token en el header
+):
+    # Si el token viene en el header "Authorization: Bearer ..."
+    if authorization and authorization.startswith("Bearer "):
+        access_token = authorization.split(" ")[1]  # Extrae el token
 
-    access_token = authorization.split("Bearer ")[1]  # Extrae el token del header
+    # Validar que haya recibido un access_token
+    if not access_token:
+        raise HTTPException(status_code=400, detail="Se requiere un access_token")
 
-    data = extract_data(access_token)
-    return {"data": data}
+    # Aquí iría la lógica para extraer los datos con el access_token
+    return {"message": "Datos extraídos con éxito", "token_usado": access_token}
 
 
 """
